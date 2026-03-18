@@ -1,0 +1,13 @@
+query GetUsers {
+  users {
+    id
+    name
+    email
+    userType
+    isDisabled
+    roles {
+      id
+      name
+    }
+  }
+}
