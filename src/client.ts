@@ -1,5 +1,5 @@
 import { HoudiniClient } from '$houdini';
 
 export default new HoudiniClient({
-    url: 'http://localhost:5231/graphql'  // 与配置文件中的 watchSchema.url 保持一致
+    url: import.meta.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:5231/graphql'  // 使用环境变量配置后端 GraphQL 端点
 });

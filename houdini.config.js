@@ -2,7 +2,7 @@
 export default {
     
      watchSchema: {
-        url: 'http://localhost:5231/graphql',
+        url: process.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:5231/graphql',
     },
 
     // 本地 schema 文件路径（用于生成类型和查询验证）
