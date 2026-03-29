@@ -1,14 +1,8 @@
-import { GetUsersStore } from "../plugins/houdini-svelte/stores/GetUsers";
-import type { Cache as InternalCache } from "./cache/cache";
-import type { CacheTypeDef } from "./generated";
-import { Cache } from "./public";
-export * from "./client";
-export * from "./lib";
-
-export function graphql(
-    str: "query GetUsers {\r\n  users {\r\n    id\r\n    name\r\n    email\r\n    userType\r\n    isDisabled\r\n    roles {\r\n      id\r\n      name\r\n    }\r\n  }\r\n}"
-): GetUsersStore;
-
+import type { Cache as InternalCache } from './cache/cache';
+import type { CacheTypeDef } from './generated';
+import { Cache } from './public';
+export * from './client';
+export * from './lib';
 export declare function graphql<_Payload, _Result = _Payload>(str: TemplateStringsArray): _Result;
 export declare const cache: Cache<CacheTypeDef>;
 export declare function getCache(): InternalCache;
