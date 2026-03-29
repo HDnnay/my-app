@@ -24,7 +24,7 @@ export default {
     "selection": {
         "fields": {
             "users": {
-                "type": "UserDto",
+                "type": "AppUserDto",
                 "keyRaw": "users",
                 "nullable": true,
 
@@ -61,7 +61,7 @@ export default {
                         },
 
                         "roles": {
-                            "type": "RoleDto",
+                            "type": "AppRoleDto",
                             "keyRaw": "roles",
                             "nullable": true,
 

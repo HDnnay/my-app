@@ -15,7 +15,9 @@ import pluginsFromPlugins from "./plugins/injectedPlugins";
 import { DocumentStore as DocumentStore2 } from "./documentStore";
 import { fetch, mutation, query, subscription } from "./plugins";
 class HoudiniClient {
+  // the URL of the api
   url;
+  // expose operations settings
   throwOnError_operations;
   cache = null;
   throwOnError;
@@ -23,7 +25,9 @@ class HoudiniClient {
   pipeline;
   extraPlugins;
   proxies = {};
+  // this is modified by page entries when they load in order to register the components source
   componentCache = {};
+  // we need the ability to link the client up with an external cache
   setCache(cache) {
     this.cache = cache;
   }
@@ -41,7 +45,7 @@ class HoudiniClient {
     }
     this.throwOnError_operations = throwOnError?.operations ?? [];
     let serverPort = globalThis.process?.env?.HOUDINI_PORT ?? "5173";
-    this.url = url ?? (globalThis.window ? "" : `https://localhost:${serverPort}`) + localApiEndpoint(getCurrentConfig());
+    this.url = url ?? (globalThis.window ? "" : `http://localhost:${serverPort}`) + localApiEndpoint(getCurrentConfig());
     this.throwOnError = throwOnError;
     this.fetchParams = fetchParams;
     this.pipeline = pipeline;
@@ -50,16 +54,24 @@ class HoudiniClient {
   get plugins() {
     return flatten(
       [].concat(
+        // if they specified a throw behavior
         this.throwOnError ? [throwOnErrorPlugin(this.throwOnError)] : [],
         fetchParamsPlugin(this.fetchParams),
-        this.pipeline ?? [
+        // if the user wants to specify the entire pipeline, let them do so
+        this.pipeline ?? // the user doesn't have a specific pipeline so we should just add their desired plugins
+        // to the standard set
+        [
           optimisticKeys(this.cache ?? cacheRef),
+          // make sure that documents always work
           queryPlugin(this.cache ?? cacheRef),
           mutationPlugin(this.cache ?? cacheRef),
           fragmentPlugin(this.cache ?? cacheRef)
         ].concat(
+          // add the specified middlewares
           this.extraPlugins ?? [],
+          // and any middlewares we got from plugins
           pluginsFromPlugins,
+          // if they provided a fetch function, use it as the body for the fetch middleware
           fetchPlugin()
         )
       )

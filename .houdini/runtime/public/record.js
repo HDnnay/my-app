@@ -54,6 +54,11 @@ class Record {
   delete() {
     this.#cache._internal_unstable.delete(this.#id);
   }
+  /**
+   * Mark some elements of the record stale in the cache.
+   * @param field
+   * @param when
+   */
   markStale(field, {
     when
   } = {}) {

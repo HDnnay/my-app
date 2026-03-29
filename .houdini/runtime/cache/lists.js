@@ -7,6 +7,7 @@ class ListManager {
     this.rootID = rootID2;
     this.cache = cache;
   }
+  // associate list names with the handler that wraps the list
   lists = /* @__PURE__ */ new Map();
   listsByField = /* @__PURE__ */ new Map();
   get(listName, id, allLists, skipMatches) {
@@ -145,6 +146,8 @@ class List {
   get fieldRef() {
     return `${this.recordID}.${this.key}`;
   }
+  // looks for the collection of all of the lists in the cache that satisfies a when
+  // condition
   when(when) {
     return this.manager.lists.get(this.name).get(this.recordID).when(when);
   }
@@ -301,6 +304,8 @@ class List {
     const subscribers = this.cache._internal_unstable.subscriptions.get(this.recordID, this.key);
     this.cache._internal_unstable.subscriptions.remove(
       targetID,
+      // if we are unsubscribing from a connection, the fields we care about
+      // are tucked away under edges
       this.connection ? this.selection.fields.edges.selection : this.selection,
       subscribers.map((sub) => sub[0]),
       variables
@@ -359,6 +364,8 @@ class List {
       this.addToList(selection, data, variables, where, layer);
     }
   }
+  // iterating over the list handler should be the same as iterating over
+  // the underlying linked list
   *[Symbol.iterator]() {
     let entries = [];
     let value = this.cache._internal_unstable.storage.get(this.recordID, this.key).value;
@@ -417,6 +424,8 @@ class ListCollection {
   deleteListWithKey(key) {
     return this.lists = this.lists.filter((list) => list.key !== key);
   }
+  // iterating over the collection should be the same as iterating over
+  // the underlying list
   *[Symbol.iterator]() {
     for (let list of this.lists) {
       for (const entry of list) {

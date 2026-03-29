@@ -3,11 +3,13 @@ const fetchParams = (fn = () => ({})) => () => ({
     next({
       ...ctx,
       fetchParams: fn({
+        // most of the stuff comes straight from the context
         config: ctx.config,
         policy: ctx.policy,
         metadata: ctx.metadata,
         session: ctx.session,
         stuff: ctx.stuff,
+        // a few fields are renamed or modified
         document: ctx.artifact,
         variables: marshalVariables(ctx),
         text: ctx.text,

@@ -112,14 +112,12 @@ function exec(match, params) {
     }
     buffered = "";
     if (value === void 0) {
-      if (param.rest)
-        result[param.name] = "";
+      if (param.rest) result[param.name] = "";
     } else {
       result[param.name] = decodeURIComponent(value);
     }
   }
-  if (buffered)
-    return;
+  if (buffered) return;
   return result;
 }
 function escape(str) {

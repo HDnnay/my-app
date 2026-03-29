@@ -9,15 +9,20 @@ import { getClient, initClient } from "../client";
 import { getSession } from "../session";
 import { BaseStore } from "./base";
 class QueryStore extends BaseStore {
+  // whether the store requires variables for input
   variables;
+  // identify it as a query store
   kind = CompiledQueryKind;
+  // if there is a load in progress when the CSF triggers we need to stop it
   loadPending = false;
+  // the string identifying the store
   storeName;
   constructor({ artifact, storeName, variables }) {
     const fetching = artifact.pluginData["houdini-svelte"]?.isManualLoad !== true;
     super({
       artifact,
       fetching,
+      // only initialize the store if it was automatically loaded
       initialize: !artifact.pluginData["houdini-svelte"].isManualLoad
     });
     this.storeName = storeName;
@@ -87,6 +92,8 @@ This will result in duplicate queries. If you are trying to ensure there is alwa
         metadata: params.metadata,
         session: context.session,
         policy: CachePolicy.CacheOnly,
+        // if the CacheOnly request doesn't give us anything,
+        // don't update the store
         silenceEcho: true,
         abortController: params.abortController
       });
@@ -163,6 +170,7 @@ export async function load(${log.yellow("event")}: LoadEvent) {
 await mutation.mutate({ ... }, ${log.yellow("{ event }")})
 `;
 class QueryStoreCursor extends QueryStore {
+  // all paginated stores need to have a flag to distinguish from other query stores
   paginated = true;
   constructor(config) {
     super(config);
@@ -229,6 +237,7 @@ class QueryStoreCursor extends QueryStore {
   subscribe(run, invalidate) {
     const combined = derived([{ subscribe: super.subscribe.bind(this) }], ([$parent]) => {
       return {
+        // @ts-ignore
         ...$parent,
         pageInfo: extractPageInfo($parent.data, this.artifact.refetch.path)
       };
@@ -237,6 +246,7 @@ class QueryStoreCursor extends QueryStore {
   }
 }
 class QueryStoreOffset extends QueryStore {
+  // all paginated stores need to have a flag to distinguish from other query stores
   paginated = true;
   async loadNextPage(args) {
     const handlers = await this.#handlers();

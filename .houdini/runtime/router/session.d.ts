@@ -17,5 +17,6 @@ export type ServerResponse = {
     redirect(url: string, status?: number): void;
     set_header(name: string, value: string): void;
 };
+export declare const session_cookie_name = "__houdini__";
 export declare function get_session(req: Headers, secrets: string[]): Promise<App.Session>;
 export {};

@@ -10,6 +10,8 @@ const query = (cache) => documentPlugin(ArtifactKind.Query, function() {
       };
       ctx.variables = {
         ...lastVariables,
+        // we need to evaluate any runtime scalars but allow the user to overwrite them
+        // by explicitly passing variables
         ...Object.fromEntries(
           Object.entries(ctx.artifact.input?.runtimeScalars ?? {}).map(
             ([field, type]) => {
@@ -25,6 +27,8 @@ const query = (cache) => documentPlugin(ArtifactKind.Query, function() {
       };
       next(ctx);
     },
+    // patch subscriptions on the way out so that we don't get a cache update
+    // before the promise resolves
     end(ctx, { resolve, marshalVariables, variablesChanged }) {
       if (variablesChanged(ctx) && !ctx.cacheParams?.disableSubscriptions) {
         if (subscriptionSpec) {

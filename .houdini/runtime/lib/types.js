@@ -31,8 +31,17 @@ const RefetchUpdateMode = {
   replace: "replace"
 };
 const DataSource = {
+  /**
+   * from the browser cache
+   */
   Cache: "cache",
+  /**
+   * from a browser side `fetch`
+   */
   Network: "network",
+  /**
+   * from a server side `fetch`
+   */
   Ssr: "ssr"
 };
 const fragmentKey = " $fragments";

@@ -6,7 +6,6 @@ import type { ArgType, CacheTypeDef, IDFields, QueryInput, QueryList, QueryValue
 export declare class Cache<Def extends CacheTypeDef> {
     _internal_unstable: _Cache;
     constructor(cache: _Cache);
-    validateInstabilityWarning(): void;
     get<T extends TypeNames<Def>>(type: T, data: IDFields<Def, T>): Record<Def, T>;
     get config(): import("../lib").ConfigFile;
     list<Name extends ValidLists<Def>>(name: Name, { parentID, allLists }?: {

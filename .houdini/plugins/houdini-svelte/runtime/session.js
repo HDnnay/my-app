@@ -18,6 +18,7 @@ class RequestContext {
     const fetch = typeof window !== "undefined" ? this.loadEvent.fetch.bind(window) : this.loadEvent.fetch;
     return fetch(input, init);
   }
+  // This hook fires before executing any queries, it allows custom props to be passed to the component.
   async invokeLoadHook({
     variant,
     hookFn,

@@ -23,6 +23,8 @@ const optimisticKeys = (cache, callbackCache = callbacks, keyCache = keys, objec
       }
       next(newCtx);
     },
+    // if a request has variables that contain an optimistic key we need to block the
+    // request before it is sent to the server
     beforeNetwork(ctx, { next }) {
       if (Object.keys(keyCache).length === 0) {
         return next(ctx);
@@ -72,6 +74,7 @@ const optimisticKeys = (cache, callbackCache = callbacks, keyCache = keys, objec
       }
       resolve(ctx);
     },
+    // when the mutation ends, we no longer have any dependents that we have to track
     end(ctx, { resolve }) {
       if (typeof ctx.stuff.mutationID !== "undefined") {
         delete keyCache[ctx.stuff.mutationID];
@@ -270,13 +273,13 @@ function replaceKeyWithVariable(variables, keys2) {
 }
 function generateKey(type) {
   if (type === "Int") {
-    return new Date().getTime();
+    return (/* @__PURE__ */ new Date()).getTime();
   }
   if (type === "String") {
-    return new Date().getTime().toString();
+    return (/* @__PURE__ */ new Date()).getTime().toString();
   }
   if (type === "ID") {
-    return new Date().getTime().toString();
+    return (/* @__PURE__ */ new Date()).getTime().toString();
   }
   throw new Error(
     `unsupported type for optimistic key: ${type}. Please provide a value in your mutation arguments.`

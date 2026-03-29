@@ -25,6 +25,8 @@ const fetch = (target) => {
           }
         }
         const result = await fetchFn({
+          // wrap the user's fetch function so we can identify SSR by checking
+          // the response.url
           fetch: (url, args) => {
             const newArgs = handleMultipart(fetchParams, args) ?? args;
             return fetch2(url, {
@@ -117,8 +119,7 @@ function isExtractableFile(value) {
   return typeof File !== "undefined" && value instanceof File || typeof Blob !== "undefined" && value instanceof Blob;
 }
 function extractFiles(value) {
-  if (!arguments.length)
-    throw new TypeError("Argument 1 `value` is required.");
+  if (!arguments.length) throw new TypeError("Argument 1 `value` is required.");
   const clones = /* @__PURE__ */ new Map();
   const files = /* @__PURE__ */ new Map();
   function recurse(value2, path, recursed) {
@@ -133,8 +134,16 @@ function extractFiles(value) {
       let clone = clones.get(value2);
       const uncloned = !clone;
       if (uncloned) {
-        clone = valueIsList ? [] : value2 instanceof Object ? {} : /* @__PURE__ */ Object.create(null);
-        clones.set(value2, clone);
+        clone = valueIsList ? [] : (
+          // Replicate if the plain object is an `Object` instance.
+          value2 instanceof /** @type {any} */
+          Object ? {} : /* @__PURE__ */ Object.create(null)
+        );
+        clones.set(
+          value2,
+          /** @type {Clone} */
+          clone
+        );
       }
       if (!recursed.has(value2)) {
         const pathPrefix = path ? `${path}.` : "";
@@ -143,8 +152,7 @@ function extractFiles(value) {
           let index = 0;
           for (const item of value2) {
             const itemClone = recurse(item, pathPrefix + index++, recursedDeeper);
-            if (uncloned)
-              clone.push(itemClone);
+            if (uncloned) clone.push(itemClone);
           }
         } else
           for (const key in value2) {

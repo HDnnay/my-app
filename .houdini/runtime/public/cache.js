@@ -6,15 +6,8 @@ class Cache {
   constructor(cache) {
     this._internal_unstable = cache;
   }
-  validateInstabilityWarning() {
-    if (!this.config.acceptImperativeInstability && !this.config.features?.imperativeCache) {
-      console.warn(`\u26A0\uFE0F  The imperative cache API is considered unstable and will change in any minor version release
-Please acknowledge this by enabling the imperative cache feature flage in your config file.
-For more information: https://houdinigraphql.com/api/cache`);
-    }
-  }
+  // return the record proxy for the given type/id combo
   get(type, data) {
-    this.validateInstabilityWarning();
     let recordID = this._internal_unstable._internal_unstable.id(type, data);
     if (!recordID) {
       throw new Error("todo");
@@ -30,7 +23,6 @@ For more information: https://houdinigraphql.com/api/cache`);
     return getCurrentConfig();
   }
   list(name, { parentID, allLists } = {}) {
-    this.validateInstabilityWarning();
     return new ListCollection({
       cache: this,
       name,
@@ -42,7 +34,6 @@ For more information: https://houdinigraphql.com/api/cache`);
     query,
     variables
   }) {
-    this.validateInstabilityWarning();
     return this._internal_unstable.read({
       selection: query.artifact.selection,
       variables
@@ -53,9 +44,9 @@ For more information: https://houdinigraphql.com/api/cache`);
     variables,
     data
   }) {
-    this.validateInstabilityWarning();
     this._internal_unstable.write({
       selection: query.artifact.selection,
+      // @ts-expect-error
       data,
       variables: marshalInputs({
         config: this.config,
@@ -65,9 +56,15 @@ For more information: https://houdinigraphql.com/api/cache`);
     });
     return;
   }
+  /**
+   * Mark some elements of the cache stale.
+   */
   markStale(type, options) {
     return this._internal_unstable.markTypeStale(type ? { ...options, type } : void 0);
   }
+  /**
+   * Reset the entire cache by clearing all records and lists
+   */
   reset() {
     return this._internal_unstable.reset();
   }

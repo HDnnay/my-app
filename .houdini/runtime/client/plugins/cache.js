@@ -20,7 +20,8 @@ const cachePolicy = ({
             variables: marshalVariables(ctx),
             fullCheck: true
           });
-          const allowed = !value.partial || artifact.kind === ArtifactKind.Query && artifact.partial;
+          const allowed = !value.partial || // or the artifact allows for partial responses
+          artifact.kind === ArtifactKind.Query && artifact.partial;
           if (policy === CachePolicy.CacheOnly) {
             return resolve(ctx, {
               fetching: false,
@@ -44,7 +45,8 @@ const cachePolicy = ({
               stale: value.stale
             });
           }
-          if (useCache && !value.partial && !value.stale && ctx.policy !== "CacheAndNetwork") {
+          if (useCache && !value.partial && !value.stale && // if the policy is CacheAndNetwork then we don't want to stop here regardless
+          ctx.policy !== "CacheAndNetwork") {
             return;
           }
         }

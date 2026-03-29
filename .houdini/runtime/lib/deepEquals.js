@@ -1,6 +1,5 @@
 function deepEquals(objA, objB, map = /* @__PURE__ */ new WeakMap()) {
-  if (Object.is(objA, objB))
-    return true;
+  if (Object.is(objA, objB)) return true;
   if (objA instanceof Date && objB instanceof Date) {
     return objA.getTime() === objB.getTime();
   }
@@ -10,8 +9,7 @@ function deepEquals(objA, objB, map = /* @__PURE__ */ new WeakMap()) {
   if (typeof objA !== "object" || objA === null || typeof objB !== "object" || objB === null) {
     return false;
   }
-  if (map.get(objA) === objB)
-    return true;
+  if (map.get(objA) === objB) return true;
   map.set(objA, objB);
   const keysA = Reflect.ownKeys(objA);
   const keysB = Reflect.ownKeys(objB);

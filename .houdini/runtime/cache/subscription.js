@@ -135,6 +135,7 @@ class InMemorySubscriptions {
       }, {})
     });
   }
+  // this is different from add because of the treatment of lists
   addMany({
     parent,
     variables,

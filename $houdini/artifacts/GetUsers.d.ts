@@ -45,7 +45,7 @@ export type GetUsers$artifact = {
     "selection": {
         "fields": {
             "users": {
-                "type": "UserDto";
+                "type": "AppUserDto";
                 "keyRaw": "users";
                 "nullable": true;
                 "selection": {
@@ -76,7 +76,7 @@ export type GetUsers$artifact = {
                             "visible": true;
                         };
                         "roles": {
-                            "type": "RoleDto";
+                            "type": "AppRoleDto";
                             "keyRaw": "roles";
                             "nullable": true;
                             "selection": {

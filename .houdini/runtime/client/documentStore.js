@@ -13,9 +13,14 @@ class DocumentStore extends Writable {
   artifact;
   #client;
   #configFile;
+  // the list of instantiated plugins
   #plugins;
+  // we need to track the last set of variables used so we can
+  // detect if they have changed
   #lastVariables;
+  // we need the last context value we've seen in order to pass it during cleanup
   #lastContext = null;
+  // a reference to the earliest resolving open promise that the store has sent
   pendingPromise = null;
   serverSideFallback;
   controllerKey(variables) {
@@ -54,6 +59,7 @@ class DocumentStore extends Writable {
     this.#lastVariables = null;
     this.#configFile = getCurrentConfig();
     this.#plugins = pipeline ?? [
+      // cache policy needs to always come first so that it can be the first network to fire
       cachePolicy({
         cache,
         enabled: enableCache,
@@ -70,6 +76,7 @@ class DocumentStore extends Writable {
       ...plugins ?? []
     ];
   }
+  // used by the client to send a new set of variables to the pipeline
   async send({
     metadata,
     session,
@@ -136,6 +143,7 @@ class DocumentStore extends Writable {
           reject,
           then: (...args) => promise.then(...args)
         },
+        // patch the context with new variables
         context
       };
       if (this.pendingPromise === null) {
@@ -214,7 +222,14 @@ class DocumentStore extends Writable {
         marshalVariables,
         updateState: this.update.bind(this),
         next: (newContext) => {
-          const nextIndex = ["forward", "error"].includes(direction) ? index + 1 : index;
+          const nextIndex = ["forward", "error"].includes(direction) ? (
+            // if we're going forward, add one
+            index + 1
+          ) : (
+            // if we're moving backwards but called next, we
+            // we need to invoke the same hook
+            index
+          );
           const nextStep = ["backwards", "error"].includes(direction) ? 0 : ctx.currentStep;
           this.#step("forward", {
             ...ctx,
@@ -224,7 +239,14 @@ class DocumentStore extends Writable {
           });
         },
         resolve: (newContext, value2) => {
-          const nextIndex = direction === "backwards" ? index - 1 : index;
+          const nextIndex = direction === "backwards" ? (
+            // if we're going backwards, subtract one
+            index - 1
+          ) : (
+            // if we're moving forwards but then call resolve
+            // we need to visit the same hook
+            index
+          );
           this.#step(
             "backwards",
             {
@@ -243,9 +265,9 @@ class DocumentStore extends Writable {
         handlers = {
           ...common,
           value,
-          resolve: (ctx2, data) => {
+          resolve: ((ctx2, data) => {
             return common.resolve(ctx2, data ?? value);
-          }
+          })
         };
       } else if (direction === "error") {
         handlers = {
@@ -321,6 +343,7 @@ class DocumentStore extends Writable {
   }
 }
 class ClientPluginContextWrapper {
+  // separate the last variables from what we pass to the user
   #context;
   #lastVariables;
   constructor({
@@ -333,6 +356,8 @@ class ClientPluginContextWrapper {
   get variables() {
     return this.#context.variables;
   }
+  // draft produces a wrapper over the context so users can mutate it without
+  // actually affecting the context values
   draft() {
     const ctx = {
       ...this.#context
@@ -400,6 +425,7 @@ class ClientPluginContextWrapper {
     };
     return ctx;
   }
+  // apply applies the draft value in a new context
   apply(values, newVariables) {
     if (newVariables) {
       values = this.applyVariables(this.#context, values);

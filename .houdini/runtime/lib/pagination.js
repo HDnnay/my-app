@@ -119,7 +119,8 @@ function cursorHandlers({
       const queryVariables = {};
       const count = countPage(artifact.refetch.path.concat("edges"), getState()) || artifact.refetch.pageSize;
       if (count && count > artifact.refetch.pageSize) {
-        if (currentPageInfo.hasPreviousPage && currentPageInfo.hasNextPage && !(variables?.["first"] && variables?.["after"] || variables?.["last"] && variables?.["before"])) {
+        if (currentPageInfo.hasPreviousPage && currentPageInfo.hasNextPage && // only log if they haven't provided special parameters
+        !(variables?.["first"] && variables?.["after"] || variables?.["last"] && variables?.["before"])) {
           console.warn(`\u26A0\uFE0F Encountered a fetch() in the middle of the connection.
 Make sure to pass a cursor value by hand that includes the current set (ie the entry before startCursor)
 `);

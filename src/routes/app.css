@@ -1,0 +1,20 @@
+/* The following directives require Tailwind CSS processing. 
+   Make sure your build tool (like PostCSS with Tailwind plugin) is set up correctly. */
+/*
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 这里可以写你自己的全局样式 */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+}
+
+text-primary {
+  
+}
