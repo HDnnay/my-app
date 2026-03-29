@@ -69,7 +69,6 @@ type AppMenuDto {
   order: Int
   parentId: ID
   path: String
-  permissions: [PermissionDto!]!
   updatedAt: DateTime
 }
 
@@ -110,58 +109,36 @@ type AppUserDto {
   userType: String!
 }
 
-type Article {
-  comments: [ArticleComment!]
-  content: String!
-  createTiem: DateTime!
-  createUser: User
-  id: UUID!
-  isVisiable: Boolean!
-  subtitle: String
-  tags: [Tag!]
-  title: String!
-  topic: String
-  userId: UUID!
-}
-
-type ArticleComment {
-  comment: String!
-  createTiem: DateTime!
-  id: UUID!
-  isVisiable: Boolean!
-  userId: UUID!
-}
-
-input ArticleCommentFilterInput {
-  and: [ArticleCommentFilterInput!]
+input ArticleCommentDtoFilterInput {
+  and: [ArticleCommentDtoFilterInput!]
   comment: StringOperationFilterInput
   createTiem: DateTimeOperationFilterInput
   id: UuidOperationFilterInput
   isVisiable: BooleanOperationFilterInput
-  or: [ArticleCommentFilterInput!]
+  or: [ArticleCommentDtoFilterInput!]
   userId: UuidOperationFilterInput
 }
 
-input ArticleFilterInput {
-  and: [ArticleFilterInput!]
-  comments: ListFilterInputTypeOfArticleCommentFilterInput
+input ArticleDtoFilterInput {
+  and: [ArticleDtoFilterInput!]
+  comments: ListFilterInputTypeOfArticleCommentDtoFilterInput
   content: StringOperationFilterInput
   createTiem: DateTimeOperationFilterInput
-  createUser: UserFilterInput
+  createUser: UserDtoFilterInput
   id: UuidOperationFilterInput
   isVisiable: BooleanOperationFilterInput
-  or: [ArticleFilterInput!]
+  or: [ArticleDtoFilterInput!]
   subtitle: StringOperationFilterInput
-  tags: ListFilterInputTypeOfTagFilterInput
+  tags: ListFilterInputTypeOfTagDtoFilterInput
   title: StringOperationFilterInput
   topic: StringOperationFilterInput
   userId: UuidOperationFilterInput
 }
 
-input ArticleSortInput {
+input ArticleDtoSortInput {
   content: SortEnumType
   createTiem: SortEnumType
-  createUser: UserSortInput
+  createUser: UserDtoSortInput
   id: SortEnumType
   isVisiable: SortEnumType
   subtitle: SortEnumType
@@ -176,7 +153,7 @@ type ArticlesConnection {
   edges: [ArticlesEdge!]
 
   """A flattened list of the nodes."""
-  nodes: [Article!]
+  nodes: [AppArticleDto!]
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -191,7 +168,7 @@ type ArticlesEdge {
   cursor: String!
 
   """The item at the end of the edge."""
-  node: Article!
+  node: AppArticleDto!
 }
 
 input BooleanOperationFilterInput {
@@ -199,24 +176,14 @@ input BooleanOperationFilterInput {
   neq: Boolean
 }
 
-"""
-The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255.
-"""
-scalar Byte
-
-input ByteOperationFilterInput {
-  eq: Byte
-  gt: Byte
-  gte: Byte
-  in: [Byte]
-  lt: Byte
-  lte: Byte
-  neq: Byte
-  ngt: Byte
-  ngte: Byte
-  nin: [Byte]
-  nlt: Byte
-  nlte: Byte
+input CreateArticleCommandInput {
+  content: String!
+  isVisiable: Boolean!
+  subtitle: String
+  tagIds: [UUID!]
+  title: String!
+  topic: String
+  userId: UUID!
 }
 
 input CreateMenuCommandInput {
@@ -258,130 +225,39 @@ input DateTimeOperationFilterInput {
   nlte: DateTime
 }
 
-type Email {
-  value: String!
-}
-
-input EmailFilterInput {
-  and: [EmailFilterInput!]
-  or: [EmailFilterInput!]
-  value: StringOperationFilterInput
-}
-
-input EmailSortInput {
-  value: SortEnumType
-}
-
-input IntOperationFilterInput {
-  eq: Int
-  gt: Int
-  gte: Int
-  in: [Int]
-  lt: Int
-  lte: Int
-  neq: Int
-  ngt: Int
-  ngte: Int
-  nin: [Int]
-  nlt: Int
-  nlte: Int
-}
-
-input ListByteOperationFilterInput {
-  all: ByteOperationFilterInput
+input ListFilterInputTypeOfArticleCommentDtoFilterInput {
+  all: ArticleCommentDtoFilterInput
   any: Boolean
-  none: ByteOperationFilterInput
-  some: ByteOperationFilterInput
+  none: ArticleCommentDtoFilterInput
+  some: ArticleCommentDtoFilterInput
 }
 
-input ListFilterInputTypeOfArticleCommentFilterInput {
-  all: ArticleCommentFilterInput
+input ListFilterInputTypeOfPermissionDtoFilterInput {
+  all: PermissionDtoFilterInput
   any: Boolean
-  none: ArticleCommentFilterInput
-  some: ArticleCommentFilterInput
+  none: PermissionDtoFilterInput
+  some: PermissionDtoFilterInput
 }
 
-input ListFilterInputTypeOfMenuFilterInput {
-  all: MenuFilterInput
+input ListFilterInputTypeOfRoleDtoFilterInput {
+  all: RoleDtoFilterInput
   any: Boolean
-  none: MenuFilterInput
-  some: MenuFilterInput
+  none: RoleDtoFilterInput
+  some: RoleDtoFilterInput
 }
 
-input ListFilterInputTypeOfPermissionFilterInput {
-  all: PermissionFilterInput
+input ListFilterInputTypeOfTagDtoFilterInput {
+  all: TagDtoFilterInput
   any: Boolean
-  none: PermissionFilterInput
-  some: PermissionFilterInput
-}
-
-input ListFilterInputTypeOfPermissionMenuFilterInput {
-  all: PermissionMenuFilterInput
-  any: Boolean
-  none: PermissionMenuFilterInput
-  some: PermissionMenuFilterInput
-}
-
-input ListFilterInputTypeOfRoleFilterInput {
-  all: RoleFilterInput
-  any: Boolean
-  none: RoleFilterInput
-  some: RoleFilterInput
-}
-
-input ListFilterInputTypeOfTagFilterInput {
-  all: TagFilterInput
-  any: Boolean
-  none: TagFilterInput
-  some: TagFilterInput
-}
-
-input ListFilterInputTypeOfUserFilterInput {
-  all: UserFilterInput
-  any: Boolean
-  none: UserFilterInput
-  some: UserFilterInput
-}
-
-type Menu {
-  children: [Menu!]!
-  createTiem: DateTime!
-  icon: String!
-  id: UUID!
-  isVisiable: Boolean!
-  name: String!
-  order: Int!
-  parent: Menu
-  parentId: UUID
-  path: String!
-  permissionMenus: [PermissionMenu!]!
-  updatedAt: DateTime
-  version: [Byte!]!
-}
-
-input MenuFilterInput {
-  and: [MenuFilterInput!]
-  children: ListFilterInputTypeOfMenuFilterInput
-  createTiem: DateTimeOperationFilterInput
-  icon: StringOperationFilterInput
-  id: UuidOperationFilterInput
-  isVisiable: BooleanOperationFilterInput
-  name: StringOperationFilterInput
-  or: [MenuFilterInput!]
-  order: IntOperationFilterInput
-  parent: MenuFilterInput
-  parentId: UuidOperationFilterInput
-  path: StringOperationFilterInput
-  permissionMenus: ListFilterInputTypeOfPermissionMenuFilterInput
-  updatedAt: DateTimeOperationFilterInput
-  version: ListByteOperationFilterInput
+  none: TagDtoFilterInput
+  some: TagDtoFilterInput
 }
 
 type Mutation {
   assignPermissionsToMenu(id: UUID!, permissionIds: [UUID!]!): SuccessResponse!
   assignPermissionsToRole(id: UUID!, permissionIds: [UUID!]!): SuccessResponse!
   assignRolesToUser(id: UUID!, roleIds: [UUID!]!): SuccessResponse!
-  createArticle(content: String!, isVisiable: Boolean!, subtitle: String, tagIds: [UUID!], title: String!, topic: String, userId: UUID!): AppArticleDto!
+  createArticle(command: CreateArticleCommandInput!): AppArticleDto!
   createMenu(command: CreateMenuCommandInput!): AppMenuDto!
   createRole(command: CreateRoleCommandInput!): AppRoleDto!
   createUser(command: CreateUserCommandInput!): UUID!
@@ -389,7 +265,7 @@ type Mutation {
   deleteMenu(id: UUID!): SuccessResponse!
   deleteRole(id: UUID!): SuccessResponse!
   deleteUser(id: UUID!): SuccessResponse!
-  updateArticle(content: String!, id: UUID!, isVisiable: Boolean!, subtitle: String, tagIds: [UUID!], title: String!, topic: String): AppArticleDto!
+  updateArticle(command: UpdateArticleCommandInput!, id: UUID!): AppArticleDto!
   updateMenu(command: UpdateMenuCommandInput!, id: UUID!): AppMenuDto!
   updateRole(command: UpdateRoleCommandInput!, id: UUID!): AppRoleDto!
   updateUser(command: UpdateUserCommandInput!, id: UUID!): AppUserDto!
@@ -414,65 +290,18 @@ type PageInfo {
   startCursor: String
 }
 
-type Permission {
-  childPermissions: [Permission!]!
-  code: String!
-  createdAt: DateTime!
-  description: String
-  id: UUID!
-  name: String!
-  parent: Permission
-  parentId: UUID
-  permissionMenus: [PermissionMenu!]!
-  roles: [Role!]!
-  updatedAt: DateTime
-}
-
-type PermissionDto {
-  childPermissions: [PermissionDto!]!
-  code: String!
-  createdAt: DateTime!
-  description: String
-  id: UUID!
-  name: String!
-  parentId: UUID
-  updatedAt: DateTime
-}
-
-input PermissionFilterInput {
-  and: [PermissionFilterInput!]
-  childPermissions: ListFilterInputTypeOfPermissionFilterInput
+input PermissionDtoFilterInput {
+  and: [PermissionDtoFilterInput!]
+  childPermissions: ListFilterInputTypeOfPermissionDtoFilterInput
   code: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   description: StringOperationFilterInput
   id: UuidOperationFilterInput
   name: StringOperationFilterInput
-  or: [PermissionFilterInput!]
-  parent: PermissionFilterInput
+  or: [PermissionDtoFilterInput!]
   parentId: UuidOperationFilterInput
-  permissionMenus: ListFilterInputTypeOfPermissionMenuFilterInput
-  roles: ListFilterInputTypeOfRoleFilterInput
+  roles: ListFilterInputTypeOfRoleDtoFilterInput
   updatedAt: DateTimeOperationFilterInput
-}
-
-type PermissionMenu {
-  createdAt: DateTime!
-  id: UUID!
-  menu: Menu!
-  menuId: UUID!
-  permission: Permission!
-  permissionId: UUID!
-}
-
-input PermissionMenuFilterInput {
-  and: [PermissionMenuFilterInput!]
-  createdAt: DateTimeOperationFilterInput
-  id: UuidOperationFilterInput
-  menu: MenuFilterInput
-  menuId: UuidOperationFilterInput
-  or: [PermissionMenuFilterInput!]
-  permission: PermissionFilterInput
-  permissionId: UuidOperationFilterInput
 }
 
 type Query {
@@ -497,8 +326,14 @@ type Query {
 
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [ArticleSortInput!]
-    where: ArticleFilterInput
+    order: [ArticleDtoSortInput!]
+
+    """排序字段"""
+    sortBy: String
+
+    """是否降序排序"""
+    sortDescending: Boolean
+    where: ArticleDtoFilterInput
   ): ArticlesConnection
 
   """获取菜单详情"""
@@ -532,32 +367,17 @@ type Query {
   users: [AppUserDto]
 }
 
-type Role {
-  code: String!
-  createdAt: DateTime!
-  description: String
-  id: UUID!
-  isDisabled: Boolean!
-  isSuperAdmin: Boolean!
-  name: String!
-  permissions: [Permission!]!
-  updatedAt: DateTime
-  users: [User!]!
-}
-
-input RoleFilterInput {
-  and: [RoleFilterInput!]
+input RoleDtoFilterInput {
+  and: [RoleDtoFilterInput!]
   code: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   description: StringOperationFilterInput
   id: UuidOperationFilterInput
   isDisabled: BooleanOperationFilterInput
-  isSuperAdmin: BooleanOperationFilterInput
   name: StringOperationFilterInput
-  or: [RoleFilterInput!]
-  permissions: ListFilterInputTypeOfPermissionFilterInput
+  or: [RoleDtoFilterInput!]
+  permissions: ListFilterInputTypeOfPermissionDtoFilterInput
   updatedAt: DateTimeOperationFilterInput
-  users: ListFilterInputTypeOfUserFilterInput
 }
 
 enum SortEnumType {
@@ -581,28 +401,28 @@ input StringOperationFilterInput {
 }
 
 type SuccessResponse {
+  message: String
   success: Boolean!
 }
 
-type Tag {
-  createTiem: DateTime!
-  description: String
-  id: UUID!
-  isVisiable: Boolean!
-  name: String!
-}
-
-input TagFilterInput {
-  and: [TagFilterInput!]
-  createTiem: DateTimeOperationFilterInput
-  description: StringOperationFilterInput
+input TagDtoFilterInput {
+  and: [TagDtoFilterInput!]
   id: UuidOperationFilterInput
-  isVisiable: BooleanOperationFilterInput
   name: StringOperationFilterInput
-  or: [TagFilterInput!]
+  or: [TagDtoFilterInput!]
 }
 
 scalar UUID
+
+input UpdateArticleCommandInput {
+  content: String!
+  id: UUID!
+  isVisiable: Boolean!
+  subtitle: String
+  tagIds: [UUID!]
+  title: String!
+  topic: String
+}
 
 input UpdateMenuCommandInput {
   icon: String
@@ -628,54 +448,23 @@ input UpdateUserCommandInput {
   userType: String!
 }
 
-type User {
-  email: Email!
-  id: UUID!
-  isDisabled: Boolean!
-  name: String!
-  passwordHash: String!
-  refreshToken: String
-  refreshTokenExpiryTime: DateTime
-  roles: [Role!]!
-  userType: UserType!
-}
-
-input UserFilterInput {
-  and: [UserFilterInput!]
-  email: EmailFilterInput
+input UserDtoFilterInput {
+  and: [UserDtoFilterInput!]
+  email: StringOperationFilterInput
   id: UuidOperationFilterInput
   isDisabled: BooleanOperationFilterInput
   name: StringOperationFilterInput
-  or: [UserFilterInput!]
-  passwordHash: StringOperationFilterInput
-  refreshToken: StringOperationFilterInput
-  refreshTokenExpiryTime: DateTimeOperationFilterInput
-  roles: ListFilterInputTypeOfRoleFilterInput
-  userType: UserTypeOperationFilterInput
+  or: [UserDtoFilterInput!]
+  roles: ListFilterInputTypeOfRoleDtoFilterInput
+  userType: StringOperationFilterInput
 }
 
-input UserSortInput {
-  email: EmailSortInput
+input UserDtoSortInput {
+  email: SortEnumType
   id: SortEnumType
   isDisabled: SortEnumType
   name: SortEnumType
-  passwordHash: SortEnumType
-  refreshToken: SortEnumType
-  refreshTokenExpiryTime: SortEnumType
   userType: SortEnumType
-}
-
-enum UserType {
-  ADMIN
-  DEFAULT
-  USER
-}
-
-input UserTypeOperationFilterInput {
-  eq: UserType
-  in: [UserType!]
-  neq: UserType
-  nin: [UserType!]
 }
 
 input UuidOperationFilterInput {

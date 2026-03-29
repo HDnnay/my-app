@@ -47,7 +47,7 @@
                             {/if}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button class="text-green-600 hover:text-green-900 mr-3">编辑</button>
+                            <button class="text-white bg-primary-500 hover:bg-blue-600 px-4 py-2 rounded-md mr-3">编辑</button>
                             <button class="text-red-600 hover:text-red-900">删除</button>
                         </td>
                     </tr>
