@@ -542,8 +542,13 @@ export declare type CacheTypeDef = {
                     };
                 };
                 users: {
-                    type: ((Record<CacheTypeDef, "AppUserDto"> | null))[] | null;
-                    args: never;
+                    type: Record<CacheTypeDef, "UsersConnection"> | null;
+                    args: {
+                        after?: string | null | undefined;
+                        before?: string | null | undefined;
+                        first?: number | null | undefined;
+                        last?: number | null | undefined;
+                    };
                 };
             };
             fragments: [];
@@ -557,6 +562,42 @@ export declare type CacheTypeDef = {
                 };
                 success: {
                     type: boolean;
+                    args: never;
+                };
+            };
+            fragments: [];
+        };
+        UsersConnection: {
+            idFields: never;
+            fields: {
+                edges: {
+                    type: (Record<CacheTypeDef, "UsersEdge">)[] | null;
+                    args: never;
+                };
+                nodes: {
+                    type: (Record<CacheTypeDef, "AppUserDto">)[] | null;
+                    args: never;
+                };
+                pageInfo: {
+                    type: Record<CacheTypeDef, "PageInfo">;
+                    args: never;
+                };
+                totalCount: {
+                    type: number;
+                    args: never;
+                };
+            };
+            fragments: [];
+        };
+        UsersEdge: {
+            idFields: never;
+            fields: {
+                cursor: {
+                    type: string;
+                    args: never;
+                };
+                node: {
+                    type: Record<CacheTypeDef, "AppUserDto">;
                     args: never;
                 };
             };

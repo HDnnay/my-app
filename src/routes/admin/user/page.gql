@@ -1,13 +1,22 @@
-query GetUsers {
-  users {
-    id
-    name
-    email
-    userType
-    isDisabled
-    roles {
+query GetUsers($first: Int!, $after: String) {
+  users(first: $first, after: $after) {
+    nodes {
       id
       name
+      email
+      userType
+      isDisabled
+      roles {
+        id
+        name
+      }
     }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
   }
 }

@@ -7,36 +7,78 @@ export type GetUsers$result = {
     /**
      * 获取用户列表
     */
-    readonly users: ({
-        readonly id: string;
-        readonly name: string;
-        readonly email: string;
-        readonly userType: string;
-        readonly isDisabled: boolean;
-        readonly roles: ({
+    readonly users: {
+        /**
+         * A flattened list of the nodes.
+        */
+        readonly nodes: ({
             readonly id: string;
             readonly name: string;
-        } | null)[] | null;
-    } | null)[] | null;
+            readonly email: string;
+            readonly userType: string;
+            readonly isDisabled: boolean;
+            readonly roles: ({
+                readonly id: string;
+                readonly name: string;
+            } | null)[] | null;
+        })[] | null;
+        /**
+         * Information to aid in pagination.
+        */
+        readonly pageInfo: {
+            /**
+             * Indicates whether more edges exist following the set defined by the clients arguments.
+            */
+            readonly hasNextPage: boolean;
+            /**
+             * Indicates whether more edges exist prior the set defined by the clients arguments.
+            */
+            readonly hasPreviousPage: boolean;
+            /**
+             * When paginating backwards, the cursor to continue.
+            */
+            readonly startCursor: string | null;
+            /**
+             * When paginating forwards, the cursor to continue.
+            */
+            readonly endCursor: string | null;
+        };
+        /**
+         * Identifies the total count of items in the connection.
+        */
+        readonly totalCount: number;
+    } | null;
 };
 
-export type GetUsers$input = null;
+export type GetUsers$input = {
+    first: number;
+    after?: string | null | undefined;
+};
 
 export type GetUsers$artifact = {
     "name": "GetUsers";
     "kind": "HoudiniQuery";
-    "hash": "95cb72b113e2fcac43c4c358fab56174924c147c05690eb2116cca31b5915d9f";
-    "raw": `query GetUsers {
-  users {
-    id
-    name
-    email
-    userType
-    isDisabled
-    roles {
+    "hash": "277a30882ce1b21975e7e250623ce85639053fa995f5a43abe528a8daab0fc05";
+    "raw": `query GetUsers($first: Int!, $after: String) {
+  users(first: $first, after: $after) {
+    nodes {
       id
       name
+      email
+      userType
+      isDisabled
+      roles {
+        id
+        name
+      }
     }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
   }
 }`;
     "rootType": "Query";
@@ -44,39 +86,14 @@ export type GetUsers$artifact = {
     "selection": {
         "fields": {
             "users": {
-                "type": "AppUserDto";
-                "keyRaw": "users";
+                "type": "UsersConnection";
+                "keyRaw": "users(after: $after, first: $first)";
                 "nullable": true;
                 "selection": {
                     "fields": {
-                        "id": {
-                            "type": "ID";
-                            "keyRaw": "id";
-                            "visible": true;
-                        };
-                        "name": {
-                            "type": "String";
-                            "keyRaw": "name";
-                            "visible": true;
-                        };
-                        "email": {
-                            "type": "String";
-                            "keyRaw": "email";
-                            "visible": true;
-                        };
-                        "userType": {
-                            "type": "String";
-                            "keyRaw": "userType";
-                            "visible": true;
-                        };
-                        "isDisabled": {
-                            "type": "Boolean";
-                            "keyRaw": "isDisabled";
-                            "visible": true;
-                        };
-                        "roles": {
-                            "type": "AppRoleDto";
-                            "keyRaw": "roles";
+                        "nodes": {
+                            "type": "AppUserDto";
+                            "keyRaw": "nodes";
                             "nullable": true;
                             "selection": {
                                 "fields": {
@@ -90,8 +107,79 @@ export type GetUsers$artifact = {
                                         "keyRaw": "name";
                                         "visible": true;
                                     };
+                                    "email": {
+                                        "type": "String";
+                                        "keyRaw": "email";
+                                        "visible": true;
+                                    };
+                                    "userType": {
+                                        "type": "String";
+                                        "keyRaw": "userType";
+                                        "visible": true;
+                                    };
+                                    "isDisabled": {
+                                        "type": "Boolean";
+                                        "keyRaw": "isDisabled";
+                                        "visible": true;
+                                    };
+                                    "roles": {
+                                        "type": "AppRoleDto";
+                                        "keyRaw": "roles";
+                                        "nullable": true;
+                                        "selection": {
+                                            "fields": {
+                                                "id": {
+                                                    "type": "ID";
+                                                    "keyRaw": "id";
+                                                    "visible": true;
+                                                };
+                                                "name": {
+                                                    "type": "String";
+                                                    "keyRaw": "name";
+                                                    "visible": true;
+                                                };
+                                            };
+                                        };
+                                        "visible": true;
+                                    };
                                 };
                             };
+                            "visible": true;
+                        };
+                        "pageInfo": {
+                            "type": "PageInfo";
+                            "keyRaw": "pageInfo";
+                            "selection": {
+                                "fields": {
+                                    "hasNextPage": {
+                                        "type": "Boolean";
+                                        "keyRaw": "hasNextPage";
+                                        "visible": true;
+                                    };
+                                    "hasPreviousPage": {
+                                        "type": "Boolean";
+                                        "keyRaw": "hasPreviousPage";
+                                        "visible": true;
+                                    };
+                                    "startCursor": {
+                                        "type": "String";
+                                        "keyRaw": "startCursor";
+                                        "nullable": true;
+                                        "visible": true;
+                                    };
+                                    "endCursor": {
+                                        "type": "String";
+                                        "keyRaw": "endCursor";
+                                        "nullable": true;
+                                        "visible": true;
+                                    };
+                                };
+                            };
+                            "visible": true;
+                        };
+                        "totalCount": {
+                            "type": "Int";
+                            "keyRaw": "totalCount";
                             "visible": true;
                         };
                     };
@@ -102,6 +190,15 @@ export type GetUsers$artifact = {
     };
     "pluginData": {
         "houdini-svelte": {};
+    };
+    "input": {
+        "fields": {
+            "first": "Int";
+            "after": "String";
+        };
+        "types": {};
+        "defaults": {};
+        "runtimeScalars": {};
     };
     "policy": "CacheOrNetwork";
     "partial": false;
