@@ -41,13 +41,7 @@ export const load = (async (event) => {
         const hasPreviousPage = data?.users?.pageInfo?.hasPreviousPage || false;
         const endCursor = data?.users?.pageInfo?.endCursor || null;
         
-        console.log('分页信息 - 总项目数:', totalItems);
-        console.log('分页信息 - 每页项目数:', itemsPerPage);
-        console.log('分页信息 - 当前页:', currentPage);
-        console.log('分页信息 - 总页数:', Math.ceil(totalItems / itemsPerPage));
-        console.log('分页信息 - 有下一页:', hasNextPage);
-        console.log('分页信息 - 有上一页:', hasPreviousPage);
-        console.log('分页信息 - 结束游标:', endCursor);
+
         
         return { 
             users: data?.users?.nodes || [], 

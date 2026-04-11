@@ -4,21 +4,62 @@
         currentPage = 1, 
         totalItems = 0, 
         itemsPerPage = 10, 
+        endCursor = null,
         onPageChange 
     }: {
         currentPage?: number;
         totalItems?: number;
         itemsPerPage?: number;
-        onPageChange: (page: number) => void;
+        endCursor?: string | null;
+        onPageChange: (page: number, after: string | null) => void;
     } = $props();
 
-
+    // 游标历史记录，存储每一页的游标信息
+    let cursorHistory = $state<Array<{ page: number; cursor: string | null }>>([
+        { page: 1, cursor: null }
+    ]);
 
     // 处理页码变化
     const handlePageChange = (page: number) => {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         if (page >= 1 && page <= totalPages) {
-            onPageChange(page);
+            let after = null;
+            
+            if (page === 1) {
+                // 第一页，使用 null 作为游标
+                after = null;
+            } else if (page > currentPage) {
+                // 下一页，使用当前页的 endCursor
+                after = endCursor || null;
+                
+                // 将当前页的游标信息添加到历史记录中
+                const existingIndex = cursorHistory.findIndex(item => item.page === currentPage);
+                if (existingIndex === -1) {
+                    cursorHistory.push({ 
+                        page: currentPage, 
+                        cursor: endCursor 
+                    });
+                    console.log('添加游标历史记录 - 页码:', currentPage, '游标:', endCursor);
+                }
+            } else {
+                // 上一页，从历史记录中获取上一页的游标
+                const previousPage = cursorHistory.find(item => item.page === page);
+                if (previousPage) {
+                    after = previousPage.cursor;
+                } else {
+                    // 如果没有找到上一页的游标，回到第一页
+                    after = null;
+                }
+            }
+            
+            console.log('=== 分页组件处理页码变化 ===');
+            console.log('当前页:', currentPage);
+            console.log('目标页:', page);
+            console.log('当前游标:', endCursor);
+            console.log('计算后的游标:', after);
+            console.log('当前游标历史记录:', cursorHistory);
+            
+            onPageChange(page, after);
         }
     };
 

@@ -1,9 +1,9 @@
 export default {
     "name": "GetUsers",
     "kind": "HoudiniQuery",
-    "hash": "06d44670c938d4c2326e77e4d48f544043f53a8ffde8a649c0815ebf8466bba8",
+    "hash": "277a30882ce1b21975e7e250623ce85639053fa995f5a43abe528a8daab0fc05",
 
-    "raw": `query GetUsers($first: Int, $after: String) {
+    "raw": `query GetUsers($first: Int!, $after: String) {
   users(first: $first, after: $after) {
     nodes {
       id
@@ -173,4 +173,4 @@ export default {
     "partial": false
 };
 
-"HoudiniHash=de8826158f6f5ca9cb0906284b362ace1411a1a7ac405c3c747566c8a1d4af0c";
+"HoudiniHash=a383872166e580a48ba8433a2b67b35a6badfa996baf82c747b1f70c1670952f";

@@ -27,7 +27,7 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
-		"houdini": "^2.0.0-next.11",
+		"houdini": "^3.0.0-next.13",
 		"PostCSS": "npm:postcss@^8.5.8"
 	}
 }

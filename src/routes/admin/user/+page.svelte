@@ -20,27 +20,10 @@
     });
     
     // 处理页码变化
-    const handlePageChange = (page: number) => {
-        console.log('=== 处理页码变化 ===');
-        console.log('当前页:', state.pagination.currentPage);
+    const handlePageChange = (page: number, after: string | null) => {
+        console.log('=== 页面处理页码变化 ===');
         console.log('目标页:', page);
-        console.log('当前游标:', state.pagination.endCursor);
-        
-        // 计算新的游标
-        let after = null;
-        if (page === 1) {
-            // 第一页，使用 null 作为游标
-            after = null;
-        } else if (page > state.pagination.currentPage) {
-            // 下一页，使用当前页的 endCursor
-            after = state.pagination.endCursor || null;
-        } else {
-            // 上一页，对于简单的分页，我们直接回到第一页
-            // 对于更复杂的分页，我们需要维护游标历史记录
-            after = null;
-        }
-        
-        console.log('计算后的游标:', after);
+        console.log('游标:', after);
         
         // 更新 URL 查询参数，触发页面重新加载
         const params = new URLSearchParams();
@@ -111,6 +94,7 @@
         currentPage={state.pagination.currentPage}
         totalItems={state.pagination.totalItems}
         itemsPerPage={state.pagination.itemsPerPage}
+        endCursor={state.pagination.endCursor}
         onPageChange={handlePageChange}
     />
 </div>

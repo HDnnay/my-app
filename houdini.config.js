@@ -11,10 +11,13 @@ export default {
     // 插件配置
     plugins: {
         "houdini-svelte": {
-            defaultRouteBlocking: false
+            defaultRouteBlocking: true // 启用路由阻塞，确保客户端导航时查询正确执行
         }
     },
 
+    // 缓存配置
+    //defaultCachePolicy: "NetworkOnly", // 禁用缓存，每次都从网络获取
+    
     scalars: {
         DateTime: {
             type: 'Date',

@@ -548,6 +548,8 @@ export declare type CacheTypeDef = {
                         before?: string | null | undefined;
                         first?: number | null | undefined;
                         last?: number | null | undefined;
+                        order?: (UserDtoSortInput)[] | null | undefined;
+                        where?: UserDtoFilterInput | null | undefined;
                     };
                 };
             };

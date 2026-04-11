@@ -51,15 +51,15 @@ export type GetUsers$result = {
 };
 
 export type GetUsers$input = {
-    first?: number | null | undefined;
+    first: number;
     after?: string | null | undefined;
 };
 
 export type GetUsers$artifact = {
     "name": "GetUsers";
     "kind": "HoudiniQuery";
-    "hash": "06d44670c938d4c2326e77e4d48f544043f53a8ffde8a649c0815ebf8466bba8";
-    "raw": `query GetUsers($first: Int, $after: String) {
+    "hash": "277a30882ce1b21975e7e250623ce85639053fa995f5a43abe528a8daab0fc05";
+    "raw": `query GetUsers($first: Int!, $after: String) {
   users(first: $first, after: $after) {
     nodes {
       id
