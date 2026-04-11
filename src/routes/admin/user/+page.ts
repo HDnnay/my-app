@@ -1,73 +1,36 @@
 import type { PageLoad } from './$types';
+import { GetUsersStore } from '$houdini';
 
 export const load = (async (event) => {
-    console.log('Load function executed');
+    console.log('=== Load function executed ===');
     
     try {
         // 从 URL 查询参数中获取当前页码和游标
         const currentPage = parseInt(event.url.searchParams.get('page') || '1');
         const after = event.url.searchParams.get('after') || null;
         
-        // 分页参数
-        const itemsPerPage = 10;
+        console.log('URL 参数 - 页码:', currentPage);
+        console.log('URL 参数 - 游标:', after);
         
-        // 直接使用 fetch 调用 GraphQL 服务器
-        const response = await fetch('http://localhost:5231/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                query: `query GetUsers($first: Int!, $after: String) {
-                    users(first: $first, after: $after) {
-                        nodes {
-                            id
-                            name
-                            email
-                            userType
-                            isDisabled
-                            roles {
-                                id
-                                name
-                            }
-                        }
-                        pageInfo {
-                            hasNextPage
-                            hasPreviousPage
-                            startCursor
-                            endCursor
-                        }
-                        totalCount
-                    }
-                }`,
-                variables: {
-                    first: itemsPerPage,
-                    after
-                }
-            })
+        // 分页参数
+        const itemsPerPage = 1;
+        
+        // 使用 Houdini store 获取用户数据
+        console.log('使用 Houdini store - first:', itemsPerPage, 'after:', after);
+        const store = new GetUsersStore();
+        
+        // 直接调用 Houdini 的 fetch 方法
+        const result = await store.fetch({
+            event,
+            variables: {
+                first: itemsPerPage,
+                after
+            }
         });
         
-        console.log('Response status:', response.status);
-        
-        const result = await response.json();
-        
-        console.log('GraphQL response:', result);
-        
-        if (result.errors) {
-            console.error('Error fetching users:', result.errors);
-            return { 
-                users: [], 
-                pagination: {
-                    totalItems: 0,
-                    itemsPerPage,
-                    currentPage,
-                    totalPages: 0,
-                    hasNextPage: false,
-                    hasPreviousPage: false,
-                    endCursor: null
-                }
-            };
-        }
+        console.log('Houdini result:', result);
+        console.log('Houdini data:', result.data);
+        console.log('Houdini errors:', result.errors);
         
         const data = result.data;
         console.log('Users:', data?.users);
@@ -77,6 +40,14 @@ export const load = (async (event) => {
         const hasNextPage = data?.users?.pageInfo?.hasNextPage || false;
         const hasPreviousPage = data?.users?.pageInfo?.hasPreviousPage || false;
         const endCursor = data?.users?.pageInfo?.endCursor || null;
+        
+        console.log('分页信息 - 总项目数:', totalItems);
+        console.log('分页信息 - 每页项目数:', itemsPerPage);
+        console.log('分页信息 - 当前页:', currentPage);
+        console.log('分页信息 - 总页数:', Math.ceil(totalItems / itemsPerPage));
+        console.log('分页信息 - 有下一页:', hasNextPage);
+        console.log('分页信息 - 有上一页:', hasPreviousPage);
+        console.log('分页信息 - 结束游标:', endCursor);
         
         return { 
             users: data?.users?.nodes || [], 
@@ -96,7 +67,7 @@ export const load = (async (event) => {
             users: [], 
             pagination: {
                 totalItems: 0,
-                itemsPerPage: 10,
+                itemsPerPage: 1,
                 currentPage: 1,
                 totalPages: 0,
                 hasNextPage: false,

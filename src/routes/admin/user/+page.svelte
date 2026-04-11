@@ -10,7 +10,7 @@
         users: data?.users || [],
         pagination: data?.pagination || {
             totalItems: 0,
-            itemsPerPage: 10,
+            itemsPerPage: 1,
             currentPage: 1,
             totalPages: 0,
             hasNextPage: false,
@@ -21,15 +21,26 @@
     
     // 处理页码变化
     const handlePageChange = (page: number) => {
+        console.log('=== 处理页码变化 ===');
+        console.log('当前页:', state.pagination.currentPage);
+        console.log('目标页:', page);
+        console.log('当前游标:', state.pagination.endCursor);
+        
         // 计算新的游标
         let after = null;
-        if (page > state.pagination.currentPage) {
+        if (page === 1) {
+            // 第一页，使用 null 作为游标
+            after = null;
+        } else if (page > state.pagination.currentPage) {
             // 下一页，使用当前页的 endCursor
             after = state.pagination.endCursor || null;
-        } else if (page < state.pagination.currentPage) {
-            // 上一页，需要使用上一页的游标，这里简化处理，直接回到第一页
+        } else {
+            // 上一页，对于简单的分页，我们直接回到第一页
+            // 对于更复杂的分页，我们需要维护游标历史记录
             after = null;
         }
+        
+        console.log('计算后的游标:', after);
         
         // 更新 URL 查询参数，触发页面重新加载
         const params = new URLSearchParams();
@@ -37,6 +48,8 @@
         if (after) {
             params.set('after', after);
         }
+        console.log('生成的 URL:', `/admin/user?${params.toString()}`);
+        
         goto(`/admin/user?${params.toString()}`);
     };
 </script>

@@ -1,6 +1,7 @@
 class GarbageCollector {
   cache;
   lifetimes = /* @__PURE__ */ new Map();
+  // the number of ticks of the garbage collector that a piece of data will
   get cacheBufferSize() {
     return this.cache._internal_unstable.config.cacheBufferSize ?? 10;
   }

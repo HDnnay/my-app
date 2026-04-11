@@ -6,7 +6,7 @@ export * from "./client";
 export * from "./lib";
 
 export function graphql(
-    str: "query GetUsers {\r\n  users {\r\n    id\r\n    name\r\n    email\r\n    userType\r\n    isDisabled\r\n    roles {\r\n      id\r\n      name\r\n    }\r\n  }\r\n}"
+    str: "query GetUsers($first: Int!, $after: String) {\r\n  users(first: $first, after: $after) {\r\n    nodes {\r\n      id\r\n      name\r\n      email\r\n      userType\r\n      isDisabled\r\n      roles {\r\n        id\r\n        name\r\n      }\r\n    }\r\n    pageInfo {\r\n      hasNextPage\r\n      hasPreviousPage\r\n      startCursor\r\n      endCursor\r\n    }\r\n    totalCount\r\n  }\r\n}"
 ): GetUsersStore;
 
 export declare function graphql<_Payload, _Result = _Payload>(str: TemplateStringsArray): _Result;

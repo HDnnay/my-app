@@ -11,8 +11,8 @@ class SubscriptionStore extends BaseStore {
     this.fetchingStore = writable(false);
   }
   async listen(variables, args) {
-    await initClient();
     this.fetchingStore.set(true);
+    await initClient();
     this.observer.send({
       variables,
       session: await getSession(),

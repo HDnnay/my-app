@@ -13,7 +13,6 @@ export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageParentData = EnsureDefined<LayoutData>;
 type LayoutRouteId = RouteId | "/" | "/about" | "/admin/user" | "/sverdle" | "/sverdle/how-to-play" | null
 type LayoutParams = RouteParams & {  }
-type LayoutServerParentData = EnsureDefined<{}>;
 type LayoutParentData = EnsureDefined<{}>;
 						type MakeOptional<Target, Keys extends keyof Target> = Omit<Target, Keys> & {
 							[Key in Keys]?: Target[Key] | undefined | null
@@ -25,11 +24,6 @@ export type PageLoad<OutputData extends OutputDataShape<PageParentData> = Output
 export type PageLoadEvent = Parameters<PageLoad>[0];
 export type PageData = Expand<Expand<Omit<PageParentData, keyof PageParentData & EnsureDefined<PageServerData>> & OptionalUnion<EnsureDefined<PageParentData & EnsureDefined<PageServerData>>>> & {  }>;
 export type PageProps = { params: RouteParams; data: PageData }
-export type LayoutServerLoad<OutputData extends Partial<App.PageData> & Record<string, any> | void = Partial<App.PageData> & Record<string, any> | void> = Kit.ServerLoad<LayoutParams, LayoutServerParentData, OutputData, LayoutRouteId>;
-export type LayoutServerLoadEvent = Parameters<LayoutServerLoad>[0];
 export type LayoutServerData = null;
-export type LayoutLoad<OutputData extends OutputDataShape<LayoutParentData> = OutputDataShape<LayoutParentData>> = Kit.Load<LayoutParams, LayoutServerData, LayoutParentData, OutputData, LayoutRouteId>;
-export type LayoutLoadEvent = Parameters<LayoutLoad>[0];
-export type LayoutData = Expand<Expand<Omit<LayoutParentData, keyof LayoutParentData & EnsureDefined<LayoutServerData>> & OptionalUnion<EnsureDefined<LayoutParentData & EnsureDefined<LayoutServerData>>>> & {  }>;
+export type LayoutData = Expand<Expand<LayoutParentData> & {  }>;
 export type LayoutProps = { params: LayoutParams; data: LayoutData; children: import("svelte").Snippet }
-export type RequestEvent = Kit.RequestEvent<RouteParams, RouteId>;

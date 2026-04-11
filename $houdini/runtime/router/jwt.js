@@ -1,5 +1,6 @@
 function base64UrlParse(s) {
   return new Uint8Array(
+    // @ts-ignore
     Array.prototype.map.call(
       atob(s.replace(/-/g, "+").replace(/_/g, "/").replace(/\s/g, "")),
       (c) => c.charCodeAt(0)
@@ -52,20 +53,16 @@ function _decodePayload(raw) {
   }
 }
 async function encode(payload, secret, options = { algorithm: "HS256", header: { typ: "JWT" } }) {
-  if (typeof options === "string")
-    options = { algorithm: options, header: { typ: "JWT" } };
+  if (typeof options === "string") options = { algorithm: options, header: { typ: "JWT" } };
   options = { algorithm: "HS256", header: { typ: "JWT" }, ...options };
   if (payload === null || typeof payload !== "object")
     throw new Error("payload must be an object");
   if (typeof secret !== "string" && typeof secret !== "object")
     throw new Error("secret must be a string or a JWK object");
-  if (typeof options.algorithm !== "string")
-    throw new Error("options.algorithm must be a string");
+  if (typeof options.algorithm !== "string") throw new Error("options.algorithm must be a string");
   const algorithm = algorithms[options.algorithm];
-  if (!algorithm)
-    throw new Error("algorithm not found");
-  if (!payload.iat)
-    payload.iat = Math.floor(Date.now() / 1e3);
+  if (!algorithm) throw new Error("algorithm not found");
+  if (!payload.iat) payload.iat = Math.floor(Date.now() / 1e3);
   const payloadAsJSON = JSON.stringify(payload);
   const partialToken = `${base64UrlStringify(
     _utf8ToUint8Array(JSON.stringify({ ...options.header, alg: options.algorithm }))
@@ -80,42 +77,33 @@ async function encode(payload, secret, options = { algorithm: "HS256", header: {
     keyData = _str2ab(
       secret.replace(/-----BEGIN.*?-----/g, "").replace(/-----END.*?-----/g, "").replace(/\s/g, "")
     );
-  } else
-    keyData = _utf8ToUint8Array(secret);
+  } else keyData = _utf8ToUint8Array(secret);
   const key = await crypto.subtle.importKey(keyFormat, keyData, algorithm, false, ["sign"]);
   const signature = await crypto.subtle.sign(algorithm, key, _utf8ToUint8Array(partialToken));
   return `${partialToken}.${base64UrlStringify(new Uint8Array(signature))}`;
 }
 async function verify(token, secret, options = { algorithm: "HS256", throwError: false }) {
-  if (typeof options === "string")
-    options = { algorithm: options, throwError: false };
+  if (typeof options === "string") options = { algorithm: options, throwError: false };
   options = { algorithm: "HS256", throwError: false, ...options };
-  if (typeof token !== "string")
-    throw new Error("token must be a string");
+  if (typeof token !== "string") throw new Error("token must be a string");
   if (typeof secret !== "string" && typeof secret !== "object")
     throw new Error("secret must be a string or a JWK object");
-  if (typeof options.algorithm !== "string")
-    throw new Error("options.algorithm must be a string");
+  if (typeof options.algorithm !== "string") throw new Error("options.algorithm must be a string");
   const tokenParts = token.split(".");
-  if (tokenParts.length !== 3)
-    throw new Error("token must consist of 3 parts");
+  if (tokenParts.length !== 3) throw new Error("token must consist of 3 parts");
   const algorithm = algorithms[options.algorithm];
-  if (!algorithm)
-    throw new Error("algorithm not found");
+  if (!algorithm) throw new Error("algorithm not found");
   const { payload } = decode(token);
   if (!payload) {
-    if (options.throwError)
-      throw "PARSE_ERROR";
+    if (options.throwError) throw "PARSE_ERROR";
     return false;
   }
   if (payload.nbf && payload.nbf > Math.floor(Date.now() / 1e3)) {
-    if (options.throwError)
-      throw "NOT_YET_VALID";
+    if (options.throwError) throw "NOT_YET_VALID";
     return false;
   }
   if (payload.exp && payload.exp <= Math.floor(Date.now() / 1e3)) {
-    if (options.throwError)
-      throw "EXPIRED";
+    if (options.throwError) throw "EXPIRED";
     return false;
   }
   let keyFormat = "raw";
@@ -128,8 +116,7 @@ async function verify(token, secret, options = { algorithm: "HS256", throwError:
     keyData = _str2ab(
       secret.replace(/-----BEGIN.*?-----/g, "").replace(/-----END.*?-----/g, "").replace(/\s/g, "")
     );
-  } else
-    keyData = _utf8ToUint8Array(secret);
+  } else keyData = _utf8ToUint8Array(secret);
   const key = await crypto.subtle.importKey(keyFormat, keyData, algorithm, false, ["verify"]);
   return await crypto.subtle.verify(
     algorithm,

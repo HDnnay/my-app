@@ -3,6 +3,7 @@ import { get } from "svelte/store";
 import { isBrowser } from "../adapter";
 import { getClient, initClient } from "../client";
 class BaseStore {
+  // the underlying data
   #params;
   get artifact() {
     return this.#params.artifact;
@@ -10,6 +11,9 @@ class BaseStore {
   get name() {
     return this.artifact.name;
   }
+  // loading the client is an asynchronous process so we need something for users to subscribe
+  // to while we load the client. this means we need 2 different document stores, one that
+  // the user subscribes to and one that we actually get results from.
   #store;
   #unsubscribe = null;
   constructor(params) {
@@ -47,6 +51,8 @@ class BaseStore {
       }
     };
   }
+  // in order to clear the store's value when unmounting, we need to track how many concurrent subscribers
+  // we have. when this number is 0, we need to clear the store
   #subscriberCount = 0;
   setup(init = true) {
     let initPromise = Promise.resolve();

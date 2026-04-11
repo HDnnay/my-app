@@ -16,11 +16,3 @@ export declare const SortEnumType: {
 
 export type SortEnumType$options = ValuesOf<typeof SortEnumType>
  
-export declare const UserType: {
-    readonly ADMIN: "ADMIN";
-    readonly DEFAULT: "DEFAULT";
-    readonly USER: "USER";
-}
-
-export type UserType$options = ValuesOf<typeof UserType>
- 

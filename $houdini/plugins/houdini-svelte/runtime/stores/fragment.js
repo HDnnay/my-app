@@ -20,7 +20,12 @@ class FragmentStore {
     this.name = storeName;
   }
   get(initialValue) {
-    const { variables, parent } = initialValue?.[fragmentKey]?.values?.[this.artifact.name] ?? {};
+    const { variables, parent } = (
+      // @ts-expect-error: typescript can't guarantee that the fragment key is defined
+      // but if its not, then the fragment wasn't mixed into the right thing
+      // the variables for the fragment live on the initial value's $fragment key
+      initialValue?.[fragmentKey]?.values?.[this.artifact.name] ?? {}
+    );
     const { loading } = initialValue?.[fragmentKey] ?? {};
     if (!loading && initialValue && fragmentKey in initialValue && (!variables || !parent) && isBrowser) {
       console.warn(
@@ -58,6 +63,7 @@ Please ensure that you have passed a record that has ${this.artifact.name} mixed
   }
 }
 class BasePaginatedFragmentStore {
+  // all paginated stores need to have a flag to distinguish from other fragment stores
   paginated = true;
   paginationArtifact;
   name;
@@ -91,6 +97,7 @@ class BasePaginatedFragmentStore {
   }
 }
 class FragmentStoreCursor extends BasePaginatedFragmentStore {
+  // we want to add the cursor-based fetch to the return value of get
   get(initialValue) {
     const base = new FragmentStore({
       artifact: this.artifact,
@@ -105,6 +112,7 @@ class FragmentStoreCursor extends BasePaginatedFragmentStore {
       paginationStore,
       initialValue,
       () => get(store),
+      // the variables that are needed for this query are the store's values and the ids
       () => store.variables
     );
     const subscribe = (run, invalidate) => {
@@ -121,6 +129,7 @@ class FragmentStoreCursor extends BasePaginatedFragmentStore {
       kind: CompiledFragmentKind,
       subscribe,
       fetch: handlers.fetch,
+      // add the pagination handlers
       loadNextPage: handlers.loadNextPage,
       loadPreviousPage: handlers.loadPreviousPage
     };
@@ -223,6 +232,7 @@ class FragmentStoreOffset extends BasePaginatedFragmentStore {
     return {
       kind: CompiledFragmentKind,
       data: derived(paginationStore, ($value) => $value.data),
+      // @ts-ignore
       subscribe,
       fetch: handlers.fetch,
       loadNextPage: handlers.loadNextPage,

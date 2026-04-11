@@ -32,6 +32,7 @@ async function loadAll(...loads) {
     } else {
       Object.assign(
         result,
+        // await every value in the object and assign it to result
         Object.fromEntries(
           await Promise.all(
             Object.entries(entry).map(async ([key, value]) => [

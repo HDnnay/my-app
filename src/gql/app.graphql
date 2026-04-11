@@ -378,6 +378,8 @@ type Query {
 
     """Returns the last _n_ elements from the list."""
     last: Int
+    order: [UserDtoSortInput!]
+    where: UserDtoFilterInput
   ): UsersConnection
 }
 

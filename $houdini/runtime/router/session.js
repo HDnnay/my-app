@@ -35,7 +35,7 @@ async function redirect_auth(args) {
 }
 const session_cookie_name = "__houdini__";
 async function set_session(req, response, value) {
-  const today = new Date();
+  const today = /* @__PURE__ */ new Date();
   const expires = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1e3);
   const serialized = await encode(value, req.session_keys[0]);
   response.headers.set(
@@ -52,6 +52,9 @@ async function get_session(req, secrets) {
   if (!cookie) {
     return {};
   }
+  if (cookie === "{}") {
+    return {};
+  }
   for (const secret of secrets) {
     if (!await verify(cookie, secret)) {
       continue;
@@ -66,5 +69,6 @@ async function get_session(req, secrets) {
 }
 export {
   get_session,
-  handle_request
+  handle_request,
+  session_cookie_name
 };

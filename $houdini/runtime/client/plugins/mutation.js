@@ -10,6 +10,7 @@ const mutation = (cache) => documentPlugin(ArtifactKind.Mutation, () => {
       if (optimisticResponse) {
         toNotify = cache.write({
           selection: ctx.artifact.selection,
+          // make sure that any scalar values get processed into something we can cache
           data: await marshalSelection({
             selection: ctx.artifact.selection,
             data: optimisticResponse
@@ -20,8 +21,13 @@ const mutation = (cache) => documentPlugin(ArtifactKind.Mutation, () => {
       }
       ctx.cacheParams = {
         ...ctx.cacheParams,
+        // write to the mutation's layer
         layer: layerOptimistic,
+        // notify any subscribers that we updated with the optimistic response
+        // in order to address situations where the optimistic update was wrong
         notifySubscribers: toNotify,
+        // make sure that we notify subscribers for any values that we compare
+        // in order to address any race conditions when comparing the previous value
         forceNotify: true
       };
       next(ctx);

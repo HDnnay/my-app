@@ -52,7 +52,7 @@ function serialize(name, val, options) {
     throw new TypeError("argument val is invalid");
   }
   let str = name + "=" + value;
-  if (opt.maxAge !== null) {
+  if (opt.maxAge) {
     let maxAge = opt.maxAge - 0;
     if (Number.isNaN(maxAge) || !isFinite(maxAge)) {
       throw new TypeError("option maxAge is invalid");

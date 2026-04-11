@@ -1,6 +1,15 @@
 import { computeKey } from "../lib";
 class StaleManager {
   cache;
+  // 	id {         "User:1"    "_ROOT_"
+  //   field {      "id"        "viewer"
+  // 	  number | undefined | null
+  // 	 }
+  //  }
+  // number => data ok (not stale!)
+  // undefined => no data (not stale!)
+  // null => data stale (stale)
+  // nulls mean that the value is stale, and the number is the time that the value was set
   fieldsTime = /* @__PURE__ */ new Map();
   constructor(cache) {
     this.cache = cache;
@@ -10,13 +19,28 @@ class StaleManager {
       this.fieldsTime.set(id, /* @__PURE__ */ new Map());
     }
   };
+  /**
+   * get the FieldTime info
+   * @param id User:1
+   * @param field firstName
+   */
   getFieldTime(id, field) {
     return this.fieldsTime.get(id)?.get(field);
   }
+  /**
+   * set the date to a field
+   * @param id User:1
+   * @param field firstName
+   */
   setFieldTimeToNow(id, field) {
     this.#initMapId(id);
-    this.fieldsTime.get(id)?.set(field, new Date().valueOf());
+    this.fieldsTime.get(id)?.set(field, (/* @__PURE__ */ new Date()).valueOf());
   }
+  /**
+   * set null to a field (stale)
+   * @param id User:1
+   * @param field firstName
+   */
   markFieldStale(id, field) {
     this.#initMapId(id);
     this.fieldsTime.get(id)?.set(field, null);
@@ -57,6 +81,7 @@ class StaleManager {
       }
     }
   }
+  // clean up the stale manager
   delete(id, field) {
     if (this.fieldsTime.has(id)) {
       this.fieldsTime.get(id)?.delete(field);

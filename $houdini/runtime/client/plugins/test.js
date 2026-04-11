@@ -76,7 +76,7 @@ function fakeFetch({
     partial: false,
     stale: false
   };
-  return () => ({
+  return (() => ({
     network(ctx, { resolve }) {
       spy?.(ctx);
       if (onRequest) {
@@ -85,7 +85,7 @@ function fakeFetch({
         resolve(ctx, { ...result });
       }
     }
-  });
+  }));
 }
 export {
   createStore,

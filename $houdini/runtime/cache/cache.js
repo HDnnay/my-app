@@ -11,6 +11,9 @@ import { InMemoryStorage } from "./storage";
 import { evaluateKey, rootID } from "./stuff";
 import { InMemorySubscriptions } from "./subscription";
 class Cache {
+  // the internal implementation for a lot of the cache's methods are moved into
+  // a second class to avoid users from relying on unstable APIs. typescript's private
+  // label accomplishes this but would not prevent someone using vanilla js
   _internal_unstable;
   constructor({
     disabled,
@@ -33,6 +36,8 @@ class Cache {
       this.setConfig(defaultConfigValues(config));
     }
   }
+  // walk down the selection and save the values that we encounter.
+  // any changes will notify subscribers. writing to an optimistic layer will resolve it
   write({
     layer: layerID,
     notifySubscribers = [],
@@ -43,6 +48,7 @@ class Cache {
     this.#notifySubscribers(subscribers.concat(notifySubscribers));
     return subscribers;
   }
+  // reconstruct an object with the fields/relations specified by a selection
   read(...args) {
     const { data, partial, stale, hasData } = this._internal_unstable.getSelection(...args);
     if (!hasData) {
@@ -54,6 +60,7 @@ class Cache {
       stale
     };
   }
+  // register the provided callbacks with the fields specified by the selection
   subscribe(spec, variables = {}) {
     if (this._internal_unstable.disabled) {
       return;
@@ -65,6 +72,7 @@ class Cache {
       variables
     });
   }
+  // stop listening to a particular subscription
   unsubscribe(spec, variables = {}) {
     return this._internal_unstable.subscriptions.remove(
       spec.parentID || rootID,
@@ -73,6 +81,7 @@ class Cache {
       variables
     );
   }
+  // return the list handler to mutate a named list in the cache
   list(name, parentID, allLists, skipMatches) {
     const handler = this._internal_unstable.lists.get(name, parentID, allLists, skipMatches);
     if (!handler) {
@@ -82,10 +91,12 @@ class Cache {
     }
     return handler;
   }
+  // when an optimistic key resolves, we might momentarily know the same record by different IDs
   registerKeyMap(source, mapped) {
     this._internal_unstable.storage.registerIDMapping(source, mapped);
     this._internal_unstable.subscriptions.copySubscribers(source, mapped);
   }
+  // remove the record from the cache's store and unsubscribe from it
   delete(id, layer) {
     const recordIDs = [this._internal_unstable.storage.idMaps[id], id].filter(
       Boolean
@@ -96,6 +107,7 @@ class Cache {
       this._internal_unstable.storage.delete(recordID, layer);
     }
   }
+  // set the cache's config
   setConfig(config) {
     this._internal_unstable.setConfig(config);
   }
@@ -177,6 +189,7 @@ class Cache {
     }
     this.#notifySubscribers(toNotify);
   }
+  // reset the whole cache
   reset() {
     const subSpecs = this._internal_unstable.subscriptions.reset();
     this._internal_unstable.staleManager.reset();
@@ -206,6 +219,7 @@ class Cache {
   }
 }
 class CacheInternal {
+  // for server-side requests we need to be able to flag the cache as disabled so we dont write to it
   disabled = false;
   _config;
   storage;
@@ -370,7 +384,8 @@ class CacheInternal {
             forceNotify
           });
         }
-      } else if (Array.isArray(value) && (typeof previousValue === "undefined" || previousValue === null || Array.isArray(previousValue))) {
+      } else if (Array.isArray(value) && // make typescript happy
+      (typeof previousValue === "undefined" || previousValue === null || Array.isArray(previousValue))) {
         let oldIDs = [...previousValue || []];
         if (updates?.includes("append") || updates?.includes("prepend")) {
           oldIDs = oldIDs.filter((id) => {
@@ -573,6 +588,7 @@ class CacheInternal {
     }
     return toNotify;
   }
+  // reconstruct an object defined by its selection
   getSelection({
     selection,
     parent = rootID,
@@ -761,6 +777,8 @@ class CacheInternal {
     }
     return {
       data: cascadeNull ? null : target,
+      // our value is considered true if there is some data but not everything
+      // has a full value
       partial: !generateLoading && hasData && partial,
       stale: hasData && stale,
       hasData
@@ -776,12 +794,15 @@ class CacheInternal {
     }
     return type + ":" + id;
   }
+  // the list of fields that we need in order to compute an objects id
   idFields(type) {
     return keyFieldsForType(this.config, type);
   }
   computeID(type, data) {
     return computeID(this.config, type, data);
   }
+  // figure out if this is an embedded object or a linked one by looking for all of the fields marked as
+  // required to compute the entity's id
   isEmbedded(linkedType, value) {
     const idFields = this.idFields(linkedType);
     return idFields.length === 0 || idFields.filter((field) => typeof value[field] === "undefined").length > 0;

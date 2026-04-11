@@ -17,6 +17,7 @@ class InMemoryStorage {
     this.idMaps[from] = to;
     this.idMaps[to] = from;
   }
+  // create a layer and return its id
   createLayer(optimistic = false) {
     const layer = new Layer(this.idCount++);
     layer.optimistic = optimistic;
@@ -184,6 +185,8 @@ class InMemoryStorage {
     }
     return this.data[this.data.length - 1];
   }
+  // return a string representation of all of the data and necessary state to
+  // recreate the information stored
   serialize() {
     return JSON.stringify({
       rank: this.rank,
@@ -317,6 +320,7 @@ class Layer {
       [id]: {
         ...this.operations[id],
         deleted: true,
+        // reapply any delete undos
         undoDeletesInList: []
       }
     };

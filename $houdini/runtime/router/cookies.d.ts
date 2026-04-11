@@ -29,13 +29,13 @@ export declare function parse(str: string, options?: {
  *
  */
 export declare function serialize(name: string, val: string, options: {
-    encode: boolean;
-    maxAge: number;
-    domain: string;
-    path: string;
-    expires: Date;
-    httpOnly: boolean;
-    priority: string | number;
-    secure: boolean;
-    sameSite: string | boolean;
+    encode?: boolean;
+    maxAge?: number;
+    domain?: string;
+    path?: string;
+    expires?: Date;
+    httpOnly?: boolean;
+    priority?: string | number;
+    secure?: boolean;
+    sameSite?: string | boolean;
 }): string;

@@ -5,6 +5,7 @@ const fragment = (cache) => documentPlugin(ArtifactKind.Fragment, function() {
   let subscriptionSpec = null;
   let lastReference = null;
   return {
+    // establish the cache subscription
     start(ctx, { next, resolve, variablesChanged, marshalVariables }) {
       if (!ctx.stuff.parentID) {
         return next(ctx);

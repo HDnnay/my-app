@@ -7,7 +7,7 @@ export class GetUsersStore extends QueryStore {
 		super({
 			artifact,
 			storeName: "GetUsersStore",
-			variables: true,
+			variables: false,
 		})
 	}
 }

@@ -1,14 +1,14 @@
-import { createServerAdapter as createAdapter } from "@whatwg-node/server";
-import { parse, execute } from "graphql";
-import { createYoga } from "graphql-yoga";
-import { localApiSessionKeys, localApiEndpoint, getCurrentConfig } from "../lib/config";
+import { createServerAdapter } from "@whatwg-node/server";
+import { localApiSessionKeys, getCurrentConfig } from "../lib/config";
+import { Server } from "../server";
+import { serialize as encodeCookie } from "./cookies";
 import { find_match } from "./match";
-import { get_session, handle_request } from "./session";
+import { get_session, handle_request, session_cookie_name } from "./session";
 const config_file = getCurrentConfig();
 const session_keys = localApiSessionKeys(config_file);
 function _serverHandler({
   schema,
-  yoga,
+  server,
   client,
   production,
   manifest,
@@ -16,21 +16,41 @@ function _serverHandler({
   on_render,
   componentCache
 }) {
-  if (schema && !yoga) {
-    yoga = createYoga({
+  if (schema && !server) {
+    server = new Server({
+      landingPage: !production
+    });
+  }
+  let requestHandler = null;
+  if (server && schema) {
+    requestHandler = server.init({
       schema,
-      landingPage: !production,
-      graphqlEndpoint
+      endpoint: graphqlEndpoint,
+      getSession: (request) => get_session(request.headers, session_keys)
     });
   }
   client.componentCache = componentCache;
-  if (schema) {
+  if (requestHandler) {
     client.registerProxy(graphqlEndpoint, async ({ query, variables, session }) => {
-      const parsed = parse(query);
-      return await execute(schema, parsed, null, session, variables);
+      const response = await requestHandler(
+        new Request(`http://localhost/${graphqlEndpoint}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: encodeCookie(session_cookie_name, JSON.stringify(session ?? {}), {
+              httpOnly: true
+            })
+          },
+          body: JSON.stringify({
+            query,
+            variables
+          })
+        })
+      );
+      return await response.json();
     });
   }
-  return async (request) => {
+  return async (request, ...extraContext) => {
     if (!manifest) {
       return new Response(
         "Adapter did not provide the project's manifest. Please open an issue on github.",
@@ -38,8 +58,8 @@ function _serverHandler({
       );
     }
     const url = new URL(request.url).pathname;
-    if (yoga && url === localApiEndpoint(config_file)) {
-      return yoga(request);
+    if (requestHandler && url === graphqlEndpoint) {
+      return requestHandler(request, ...extraContext);
     }
     const authResponse = await handle_request({
       request,
@@ -64,7 +84,7 @@ function _serverHandler({
   };
 }
 const serverAdapterFactory = (args) => {
-  return createAdapter(_serverHandler(args));
+  return createServerAdapter(_serverHandler(args));
 };
 export {
   _serverHandler,
